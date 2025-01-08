@@ -1,4 +1,5 @@
-RABBITMQ_SERVER = "localhost"
-QUEUE_NAME = "image_tasks"
-UPLOAD_FOLDER = "./uploads"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+RABBITMQ_SERVER="localhost"
+PORT_FLASK=5000
+QUEUE_NAME="image_tasks"
+UPLOAD_FOLDER="./uploads"
+ALLOWED_EXTENSIONS={"png", "jpg", "jpeg", "gif"}

@@ -1,0 +1,22 @@
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # AMQP protocol
+      - "15672:15672"  # RabbitMQ management interface
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  flask_server:
+    build:
+      context: ../  # Set the context to the root of your project
+      dockerfile: docker/Dockerfile.server  # Relative to the context
+    container_name: flask_server
+    ports:
+      - "5000:5000"  # Serve Flask on localhost:5000
+    environment:
+      RABBITMQ_SERVER: rabbitmq  # RabbitMQ container connection
+    depends_on:
+      - rabbitmq

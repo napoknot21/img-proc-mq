@@ -51,3 +51,38 @@ This the current project structure
 ├── README.md                          # Project documentation
 └── .env                               # Environment variables
 ```
+
+
+## Architecture
+
+```
++------------------+      +---------------------+      +---------------------+
+|   Client (UI)    | ---> |    Flask Server     | ---> |    RabbitMQ Queue    |
+|  (Upload Image)  |      |   (Task Manager)    |      |  (Task Distribution) |
++------------------+      +---------------------+      +---------------------+
+                                                            |
+                                                            v
+                                                 +-------------------------+
+                                                 |   TensorFlow Consumers  |
+                                                 |  (Distributed Workers)  |
+                                                 +-------------------------+
+                                                            |
+                                                            v
+                                                 +-------------------------+
+                                                 |      Results Queue      |
+                                                 |   (Processed Outputs)   |
+                                                 +-------------------------+
+                                                            |
+                                                            v
+                                              +-----------------------------+
+                                              |     Flask Result Store      |
+                                              |  (Aggregation & Polling)    |
+                                              +-----------------------------+
+                                                            |
+                                                            v
+                                                 +---------------------+
+                                                 |       Client         |
+                                                 |  (Poll for Results)  |
+                                                 +---------------------+
+
+```

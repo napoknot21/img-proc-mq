@@ -13,15 +13,14 @@ services:
   
   flask_server:
     build:
-      context: ../  # Set the context to the root of your project
-      dockerfile: docker/Dockerfile.server  # Relative to the context
+      context: ../
+      dockerfile: docker/Dockerfile.server
     container_name: flask_server
-    ports:
-      - "5000:5000"  # Serve Flask on localhost:5000
     environment:
-      RABBITMQ_SERVER: rabbitmq  # RabbitMQ container connection
-    depends_on:
-      - rabbitmq
+      RABBITMQ_SERVER: rabbitmq
+      RESULT_QUEUE: result_queue
+    ports:
+      - "5000:5000"
 
   compression_consumer:
     build:
@@ -34,13 +33,3 @@ services:
     depends_on:
       - rabbitmq
 
-  detection_consumer:
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile.consumer
-    container_name: detection_consumer
-    environment:
-      RABBITMQ_SERVER: rabbitmq
-    command: ["python", "consumers/detection_consumer.py"]
-    depends_on:
-      - rabbitmq

@@ -1,6 +1,7 @@
 import os, json, pika
 from flask import Flask, request, jsonify
 from io import BytesIO
+from threading import Thread
 
 from utils.rabbitmq import publish_to_queue
 from utils.file_handler import allowed_file, save_file
@@ -33,7 +34,7 @@ def upload_image():
         "file_path": file_path,
         "action": "compress"
     })
-    publish_to_queue(RABBITMQ_SERVER, QUEUE_NAME, task_message)
+    publish_to_queue(RABBITMQ_SERVER, TASK_QUEUE, task_message)
 
     return jsonify({"message": "File uploaded successfully", "file_path": file_path}), 200
 

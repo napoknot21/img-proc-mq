@@ -63,7 +63,7 @@ This the current project structure
                                                             |
                                                             v
                                                  +-------------------------+
-                                                 |   TensorFlow Consumers  |
+                                                 |        Consumers        |
                                                  |  (Distributed Workers)  |
                                                  +-------------------------+
                                                             |

@@ -1,17 +1,19 @@
 FROM python:3.9-slim
 
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Install dependencies
+# Copier les dépendances
 COPY src/consumers/requirements.txt /app/requirements.txt
+
+# Installer les dépendances
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the consumer code
-COPY src/consumers/compressor /app/
+# Copier tout le code du consumer
+COPY src/consumers /app
 
-# Set environment variables
-ENV UPLOAD_FOLDER=/app/uploads
-ENV DOWNLOAD_FOLDER=/app/downloads
+# Créer les dossiers nécessaires pour les volumes
+RUN mkdir -p /app/uploads /app/downloads
 
-# Run the consumer
+# Commande par défaut pour lancer le consumer
 CMD ["python", "main.py"]

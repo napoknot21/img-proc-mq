@@ -15,24 +15,40 @@ services:
       RABBITMQ_SERVER: rabbitmq
       RESULT_QUEUE: result_queue
     volumes:
-      - shared_data:/app/uploads  # Volume partagé pour les fichiers uploadés
+      - shared_data:/app/uploads
       - ./src/server/downloads:/app/downloads
     ports:
       - "5000:5000"
     depends_on:
       - rabbitmq
 
-  compression_consumer:
+  compression_consumer_1:
     build:
       context: ../
       dockerfile: docker/Dockerfile.consumer
-    container_name: compression_consumer
+    container_name: compression_consumer_1
     environment:
       RABBITMQ_SERVER: rabbitmq
       TASK_QUEUE: image_tasks
       RESULT_QUEUE: result_queue
     volumes:
-      - shared_data:/app/uploads  # Volume partagé pour accéder aux fichiers
+      - shared_data:/app/uploads
+      - ./src/server/downloads:/app/downloads
+    depends_on:
+      - rabbitmq
+
+
+  compression_consumer_2:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.consumer
+    container_name: compression_consumer_2
+    environment:
+      RABBITMQ_SERVER: rabbitmq
+      TASK_QUEUE: image_tasks
+      RESULT_QUEUE: result_queue
+    volumes:
+      - shared_data:/app/uploads
       - ./src/server/downloads:/app/downloads
     depends_on:
       - rabbitmq

@@ -1,13 +1,16 @@
 import os
 import json
 import pika
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, url_for
+from flask_cors import CORS
 from threading import Thread
 from utils.rabbitmq import publish_to_queue
 from utils.file_handler import allowed_file, save_file
 from config.config import *
 
 app = Flask(__name__)
+CORS(app)
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
 
@@ -49,9 +52,10 @@ def check_status():
 
     compressed_path = os.path.join(app.config['DOWNLOAD_FOLDER'], f"compressed_{os.path.basename(file_name)}")
     if os.path.exists(compressed_path):
+        download_url = url_for('download_file', file_name=f"compressed_{os.path.basename(file_name)}", _external=True)
         return jsonify({
             "status": "completed",
-            "download_url": f"/download?file_name=compressed_{os.path.basename(file_name)}"
+            "download_url": download_url
         }), 200
     else:
         return jsonify({"status": "processing"}), 200
@@ -82,23 +86,23 @@ def listen_to_results():
             try:
                 message = json.loads(body)
                 original_path = message["original_path"]
-                compressed_data = bytes.fromhex(message["compressed_data"])  # Convert hex to binary
+                compressed_path = message["compressed_path"]
 
-                # Save the compressed image in the downloads folder
-                compressed_path = os.path.join(
-                    app.config['DOWNLOAD_FOLDER'], f"compressed_{os.path.basename(original_path)}"
-                )
-                with open(compressed_path, "wb") as f:
-                    f.write(compressed_data)
+                # Ensure the compressed image path is valid
+                if not os.path.exists(compressed_path):
+                    print(f"[!] Compressed file not found: {compressed_path}")
+                else:
+                    print(f"[*] Compressed image ready: {compressed_path}")
 
-                print(f"[*] Compressed image saved to {compressed_path}")
                 ch.basic_ack(delivery_tag=method.delivery_tag)
+
             except Exception as e:
                 print(f"[!] Error processing message: {e}")
                 ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
         channel.basic_consume(queue=RESULT_QUEUE, on_message_callback=callback)
         channel.start_consuming()
+
     except pika.exceptions.AMQPConnectionError as e:
         print(f"[!] Failed to connect to RabbitMQ: {e}")
     except Exception as e:

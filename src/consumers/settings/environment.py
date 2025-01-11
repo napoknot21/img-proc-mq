@@ -11,6 +11,6 @@ def load_environment_variables():
 
     for var_name, var_value in required_env_vars.items():
         if not var_value:
-            raise EnvironmentError(f"Missing or empty environment variable: {var_name}")
+            raise EnvironmentError(f"[-] Missing or empty environment variable: {var_name}")
 
     print("[*] All required environment variables are set.")

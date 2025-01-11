@@ -1,4 +1,5 @@
-import os, json, pika
+import pika
+import os, json
 from PIL import Image
 from io import BytesIO
 

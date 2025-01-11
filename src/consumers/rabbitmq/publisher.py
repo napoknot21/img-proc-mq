@@ -1,3 +1,4 @@
+import pika
 from .connection import get_connection
 
 def publish_result(queue_name, message):

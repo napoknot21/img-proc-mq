@@ -1,17 +1,16 @@
-import pika
+import os
 from PIL import Image
-from io import BytesIO
 
-class ImageProcessor:
-    def __init__(self, quality=85, output_format="JPEG"):
-        self.quality = quality
-        self.output_format = output_format
+def compress_image(file_path):
+    """Compresse une image et retourne le chemin du fichier compressé."""
+    try:
 
-    def compress_image(self, input_path):
-        """Compresse une image et retourne les données compressées."""
-        image = Image.open(input_path)
-        compressed_image = BytesIO()
-        image.save(compressed_image, format=self.output_format, quality=self.quality)
-        compressed_image.seek(0)
-        return compressed_image.getvalue()
+        with Image.open(file_path) as img:
+            compressed_path = f"./downloads/compressed_{os.path.basename(file_path)}"
+            img = img.convert("RGB")  # Convertir en RGB si nécessaire
+            img.save(compressed_path, "JPEG", optimize=True, quality=85)
+            print(f"[+] Image compressed: {compressed_path}")
+            return compressed_path
 
+    except Exception as e:
+        raise RuntimeError(f"[-]Failed to compress image: {e}")

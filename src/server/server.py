@@ -118,13 +118,15 @@ def download_file () :
 
 
 
-def listen_to_results():
+def listen_to_results () :
     """
     Listen to the RabbitMQ result queue for compressed images.
     - Saves the compressed image to the downloads folder upon receiving a result.
     """
-    def process_result(ch, method, properties, body):
+    def process_result (ch, method, properties, body) :
+        
         try:
+            
             message = json.loads(body)
             original_path = message["original_path"]
             compressed_path = message["compressed_path"]
@@ -137,6 +139,7 @@ def listen_to_results():
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         except Exception as e:
+
             print(f"[-] Error processing message: {e}")
             ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 

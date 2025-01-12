@@ -2,7 +2,20 @@ import os
 from settings.config import RABBITMQ_SERVER, TASK_QUEUE, RESULT_QUEUE
 
 def load_environment_variables():
-    """Charge et valide les variables d'environnement requises."""
+    """
+    Validate that all required environment variables are set and not empty.
+
+    Environment Variables:
+        - RABBITMQ_SERVER: Address of the RabbitMQ server.
+        - TASK_QUEUE: Name of the RabbitMQ task queue.
+        - RESULT_QUEUE: Name of the RabbitMQ result queue.
+
+    Raises:
+        EnvironmentError: If any required environment variable is missing or empty.
+
+    Prints:
+        Confirmation that all required environment variables are set.
+    """
     required_env_vars = {
         "RABBITMQ_SERVER": RABBITMQ_SERVER,
         "TASK_QUEUE": TASK_QUEUE,

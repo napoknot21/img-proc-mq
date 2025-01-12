@@ -3,7 +3,18 @@ from settings.config import *
 from PIL import Image
 
 def compress_image(file_path):
-    """Compresse une image et retourne le chemin du fichier compressé."""
+    """
+    Compress an image and save it as a new file.
+
+    Args:
+        file_path (str): Path to the image to compress.
+
+    Returns:
+        str: Path to the compressed image file.
+
+    Raises:
+        RuntimeError: If the compression process fails.
+    """
     try:
 
         with Image.open(file_path) as img:

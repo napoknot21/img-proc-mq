@@ -1,3 +1,33 @@
+"""
+Distributed Image Processing Server
+-----------------------------------
+
+This module implements a Flask-based server that handles image upload, 
+compression, and retrieval using RabbitMQ for task distribution and 
+processing.
+
+Endpoints:
+    - `/upload` (POST): Accepts an image file for processing.
+    - `/status` (GET): Checks the status of the compressed image.
+    - `/download` (GET): Downloads the processed (compressed) image.
+
+RabbitMQ:
+    - Publishes tasks to the `TASK_QUEUE`.
+    - Consumes results from the `RESULT_QUEUE`.
+
+Global Variables:
+    - `UPLOAD_FOLDER`: Directory for storing uploaded images.
+    - `DOWNLOAD_FOLDER`: Directory for storing compressed images.
+    - `RABBITMQ_SERVER`: Address of the RabbitMQ server.
+    - `TASK_QUEUE`: Name of the queue for task distribution.
+    - `RESULT_QUEUE`: Name of the queue for processing results.
+
+Dependencies:
+    - Flask
+    - Flask-CORS
+    - pika
+    - PIL (Pillow)
+"""
 import os, json, pika
 
 from flask import Flask, request, jsonify, send_file, url_for
@@ -23,13 +53,15 @@ os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 @app.route('/upload', methods=['POST'])
 def upload_image () :
     """
-    Endpoint to upload an image.
-    - Validates the file type.
-    - Saves the file to the uploads directory.
-    - Sends the file path to RabbitMQ for processing.
+    Endpoint to upload an image for processing.
+    
+    This endpoint validates the uploaded image, saves it in the `UPLOAD_FOLDER`, 
+    and sends a task message to RabbitMQ for processing.
 
     Returns:
         JSON response with the upload status and file path.
+        - 200: Successful upload.
+        - 400: Missing or invalid file.
     """
     if 'image' not in request.files:
         return jsonify({"message": "No file part"}), 400
@@ -59,15 +91,20 @@ def upload_image () :
 @app.route('/status', methods=['GET'])
 def check_status () :
     """
-    Check the status of the compressed image.
-    - If the image is processed, returns a download link.
-    - Otherwise, returns "processing".
+    Endpoint to check the processing status of an image.
+    
+    This endpoint checks if the compressed image exists in the `DOWNLOAD_FOLDER`.
+    If processed, it provides a download link; otherwise, it indicates 
+    that the image is still being processed.
 
     Query Parameters:
-        file_name (str): The name of the original image.
+        - file_name (str): The name of the original image file.
 
     Returns:
-        JSON response with the processing status.
+        JSON response with the processing status:
+        - "completed": Includes a download link.
+        - "processing": Indicates that the image is still being processed.
+        - 400: Missing file name.
     """
     file_name = request.args.get('file_name')
 
@@ -92,14 +129,17 @@ def check_status () :
 @app.route('/download', methods=['GET'])
 def download_file () :
     """
-    Download the processed (compressed) image.
-    - Serves the file from the downloads directory.
+    Endpoint to download the processed (compressed) image.
+    
+    This endpoint serves the compressed image from the `DOWNLOAD_FOLDER` as a file download.
 
     Query Parameters:
-        file_name (str): The name of the compressed image.
+        - file_name (str): The name of the compressed image file.
 
     Returns:
-        The image file as an attachment or a 404 if not found.
+        - The image file as an attachment (200).
+        - 404: If the file does not exist.
+        - 400: If the file name is missing.
     """
     file_name = request.args.get('file_name')
     
@@ -120,8 +160,11 @@ def download_file () :
 
 def listen_to_results () :
     """
-    Listen to the RabbitMQ result queue for compressed images.
-    - Saves the compressed image to the downloads folder upon receiving a result.
+    Background thread to listen to the RabbitMQ result queue.
+    
+    This function consumes messages from the `RESULT_QUEUE` and processes the results:
+        - Saves the compressed image in the `DOWNLOAD_FOLDER`.
+        - Logs success or failure for each message.
     """
     def process_result (ch, method, properties, body) :
         

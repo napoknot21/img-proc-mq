@@ -1,19 +1,19 @@
 FROM python:3.9-slim
 
-# Définir le répertoire de travail
+# Set the working directory
 WORKDIR /app
 
-# Copier les dépendances
+# Copy the dependencies
 COPY src/consumer/requirements.txt /app/requirements.txt
 
-# Installer les dépendances
+# Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier tout le code du consumer
+# Copy all the consumer code
 COPY src/consumer /app
 
-# Créer les dossiers nécessaires pour les volumes
+# Create necessary directories for volumes
 RUN mkdir -p /app/uploads /app/downloads
 
-# Commande par défaut pour lancer le consumer
+# Default command to run the consumer
 CMD ["python", "main.py"]

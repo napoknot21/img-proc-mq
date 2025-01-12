@@ -1,26 +1,26 @@
 FROM python:3.9-slim
 
-# Définir le répertoire de travail
+# Set the working directory
 WORKDIR /app
 
-# Copier les dépendances
+# Copy the dependencies
 COPY src/server/requirements.txt /app/requirements.txt
 
-# Installer les dépendances
+# Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier tout le code du serveur Flask
+# Copy all the Flask server code
 COPY src/server /app
 
-# Créer les dossiers nécessaires pour les volumes
+# Create necessary directories for volumes
 RUN mkdir -p /app/uploads /app/downloads
 
-# Définir les volumes pour uploads et downloads
+# Define volumes for uploads and downloads
 VOLUME /app/uploads
 VOLUME /app/downloads
 
-# Exposer le port Flask
+# Expose the Flask port
 EXPOSE 5000
 
-# Définir la commande par défaut pour exécuter le serveur
+# Set the default command to run the server
 CMD ["python", "server.py"]

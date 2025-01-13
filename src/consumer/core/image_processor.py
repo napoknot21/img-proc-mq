@@ -28,4 +28,4 @@ def compress_image(file_path):
 
     except Exception as e:
 
-        raise RuntimeError(f"[-]Failed to compress image: {e}")
+        raise RuntimeError(f"[-] Failed to compress image: {e}")

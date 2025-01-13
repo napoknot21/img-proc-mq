@@ -4,7 +4,7 @@ Final [CALC](https://moodle.imt-atlantique.fr/course/view.php?id=1091) project.
 
 This project recreates an image processor app with a client where it's possible to upload images/photos and a server-side with distributed logic.
 
-
+The repport and slides can be found in the [docs](./docs) directory
 
 ## Project Structure
 

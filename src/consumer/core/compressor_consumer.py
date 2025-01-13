@@ -1,5 +1,5 @@
 import pika
-import os, json
+import os, json, time
 from PIL import Image
 from io import BytesIO
 
@@ -28,9 +28,13 @@ def process_message(ch, method, properties, body):
         return
 
     try:
-        
+        start_time = time.time()  # Start timer
         print(f"\n[*] Processing file: {file_path}\n")
         compressed_path = compress_image(file_path)
+        end_time = time.time()  # End timer
+
+        processing_time = end_time - start_time
+        print(f"[+] Image processed in {processing_time:.2f} seconds.")
         
         # Publier le résultat dans la queue
         result_message = json.dumps({
